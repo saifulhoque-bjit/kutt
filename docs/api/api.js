@@ -28,6 +28,7 @@ module.exports = {
     }
   ],
   paths: {
+    // SPEC: spec-883f26
     "/health": {
       get: {
         tags: ["health"],
@@ -36,8 +37,20 @@ module.exports = {
           "200": {
             description: "Health",
             content: {
-              "text/html": {
-                example: "OK"
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["status"],
+                  properties: {
+                    status: {
+                      type: "string",
+                      enum: ["ok"]
+                    }
+                  }
+                },
+                example: {
+                  status: "ok"
+                }
               }
             }
           }
