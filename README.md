@@ -63,7 +63,7 @@ When you first start the app, you're prompted to create an admin account.
 1. Clone this repository or [download the latest zip](https://github.com/thedevs-network/kutt/releases)
 2. Install dependencies: `npm install`
 3. Initialize database: `npm run migrate`
-5. Start the app for development `npm run dev` or production `npm start`
+4. Start the app for development `npm run dev` or production `npm start`
 
 ## Docker
 
