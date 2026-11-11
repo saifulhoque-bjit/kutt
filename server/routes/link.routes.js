@@ -103,6 +103,8 @@ router.post(
   locals.protected,
   validators.redirectProtected,
   asyncHandler(helpers.verify),
+  // SPEC: spec-a7920b
+  helpers.rateLimit({ window: 60, limit: 5 }),
   asyncHandler(link.redirectProtected)
 );
 
