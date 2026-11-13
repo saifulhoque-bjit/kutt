@@ -16,6 +16,20 @@ const env = require("../env");
 const CustomError = utils.CustomError;
 const dnsLookup = promisify(dns.lookup);
 
+// SPEC: spec-190a35
+// an expired link is handled as if it did not exist, whether or not the cleanup job has run.
+// expire_in is a Date (postgres, mysql), a utc string without zone (sqlite)
+// or an iso string with "Z" (redis cache); a value that can't be read counts as expired
+function isExpired(link) {
+  if (!link.expire_in) return false;
+  const value = link.expire_in;
+  const expireIn = value instanceof Date
+    ? value
+    : new Date(/(Z|[+-]\d{2}:?\d{2})$/i.test(value) ? value : value + "Z");
+  const time = expireIn.getTime();
+  return Number.isNaN(time) || time <= Date.now();
+}
+
 async function get(req, res) {
   const { limit, skip } = req.context;
   const search = req.query.search;
@@ -477,9 +491,9 @@ async function redirect(req, res, next) {
     domain_id: domain ? domain.id : null
   });
 
-  // 3. When no link, if has domain redirect to domain's homepage
+  // 3. When no link or link is expired, if has domain redirect to domain's homepage
   // otherwise redirect to 404
-  if (!link) {
+  if (!link || isExpired(link)) {
     return res.redirect(domain?.homepage || "/404");
   }
 
@@ -549,8 +563,8 @@ async function redirectProtected(req, res) {
   const uuid = req.params.id;
   const link = await query.link.find({ uuid });
 
-  // 2. Throw error if no link
-  if (!link || !link.password) {
+  // 2. Throw error if no link or link is expired
+  if (!link || !link.password || isExpired(link)) {
     throw new CustomError("Couldn't find the link.", 400);
   }
 
