@@ -493,6 +493,7 @@ async function redirect(req, res, next) {
 
   // 3. When no link or link is expired, if has domain redirect to domain's homepage
   // otherwise redirect to 404
+  // an expired link answers /404 (or the custom domain's homepage), never its target
   if (!link || isExpired(link)) {
     return res.redirect(domain?.homepage || "/404");
   }
