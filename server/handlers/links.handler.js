@@ -193,7 +193,8 @@ async function edit(req, res) {
     [req.body.password, "password"]
   ].forEach(([value, name]) => {
     if (!value) {
-      if (name === "password" && link.password) 
+      // only an explicit empty password removes it; a request without the field keeps it
+      if (name === "password" && link.password && value !== undefined) 
         req.body.password = null;
       else {
         delete req.body[name];
@@ -286,7 +287,8 @@ async function editAdmin(req, res) {
     [req.body.password, "password"]
   ].forEach(([value, name]) => {
     if (!value) {
-      if (name === "password" && link.password) 
+      // only an explicit empty password removes it; a request without the field keeps it
+      if (name === "password" && link.password && value !== undefined) 
         req.body.password = null;
       else {
         delete req.body[name];
